@@ -1,0 +1,14 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/product/3"
+  },
+  "response": {
+    "status": 200,
+    "fixedDelayMilliseconds": 100,
+    "bodyFileName": "doGet_productid_3.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}
