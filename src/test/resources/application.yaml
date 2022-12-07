@@ -1,0 +1,7 @@
+feign:
+  okhttp:
+    enable: true
+existing_apis:
+  host: localhost
+  port: ${wiremock.server.port}
+  endpoint: product
