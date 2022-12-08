@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/product/3/similarids"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "doGet_product_3_similarids.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}
