@@ -1,12 +1,12 @@
 {
   "request": {
     "method": "GET",
-    "urlPathPattern": "/product/5"
+    "urlPathPattern": "/product/1000"
   },
   "response": {
     "status": 200,
     "fixedDelayMilliseconds": 5000,
-    "bodyFileName": "doGet_productid_100.json",
+    "bodyFileName": "doGet_productid_1000.json",
     "headers": {
       "Content-Type": "application/json"
     }

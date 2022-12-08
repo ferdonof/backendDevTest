@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "GET",
-    "urlPathPattern": "/product/5"
+    "urlPathPattern": "/product/6"
   },
   "response": {
     "status": 500,

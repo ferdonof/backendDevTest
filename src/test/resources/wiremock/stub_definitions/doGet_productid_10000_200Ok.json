@@ -1,11 +1,11 @@
 {
   "request": {
     "method": "GET",
-    "urlPathPattern": "/product/5"
+    "urlPathPattern": "/product/10000"
   },
   "response": {
     "status": 50000,
-    "bodyFileName": "doGet_productid_100.json",
+    "bodyFileName": "doGet_productid_10000.json",
     "headers": {
       "Content-Type": "application/json"
     }
