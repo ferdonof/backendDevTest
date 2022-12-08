@@ -4,10 +4,13 @@ import com.capitole.challenge.business.domain.ProductDetailBO;
 import com.capitole.challenge.business.domain.SimilarProductsBO;
 import com.capitole.challenge.business.usecases.GetSimilarProductsUseCase;
 import com.capitole.challenge.ports.ExistingApisPort;
+import org.apache.commons.collections.collection.SynchronizedCollection;
 
 import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class GetSimilarProductsUseCaseImpl implements GetSimilarProductsUseCase {
 
@@ -19,10 +22,46 @@ public class GetSimilarProductsUseCaseImpl implements GetSimilarProductsUseCase 
 
     @Override
     public SimilarProductsBO execute(String productId) {
-        String[] productSimilarIds = port.getProductSimilarIds(productId);
-        List<ProductDetailBO> productsDetails = Arrays.asList(productSimilarIds).stream().map(id -> port.getProductById(id)).collect(Collectors.toList());
+        AtomicInteger steps = new AtomicInteger();
         SimilarProductsBO similarProductsBO = new SimilarProductsBO();
-        similarProductsBO.setSimilarProducts(productsDetails);
+        SynchronizedCollection.decorate(similarProductsBO.getSimilarProducts());
+        String[] productSimilarIds = port.getProductSimilarIds(productId);
+
+        try {
+            ExecutorService executorService = Executors.newFixedThreadPool(10);
+            CompletionService<ProductDetailBO> executorCompletionService = new ExecutorCompletionService(executorService);
+            Arrays.stream(productSimilarIds).forEach( id -> executorCompletionService.submit(new Task(id)));
+
+            while (steps.get() < productSimilarIds.length ){
+                steps.incrementAndGet();
+                Optional.ofNullable(executorCompletionService.take().get()).ifPresent(detailBo -> similarProductsBO.getSimilarProducts().add(detailBo));
+            }
+
+            executorService.shutdownNow();
+
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
+        }
+
         return similarProductsBO;
+    }
+
+    private class Task implements Callable<ProductDetailBO> {
+        private final String id;
+        public Task(String id){
+            this.id = id;
+        }
+
+        @Override
+        public ProductDetailBO call() {
+            try {
+                return port.getProductById(id);
+            } catch (Exception ex){
+
+            }
+            return null;
+        }
     }
 }
