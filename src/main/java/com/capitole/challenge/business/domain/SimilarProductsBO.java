@@ -18,4 +18,11 @@ public class SimilarProductsBO {
     public void addProduct(ProductDetailBO detail) {
         this.similarProducts.add(detail);
     }
+
+    @Override
+    public String toString() {
+        return "SimilarProductsBO{" +
+                "similarProducts=" + similarProducts +
+                '}';
+    }
 }
