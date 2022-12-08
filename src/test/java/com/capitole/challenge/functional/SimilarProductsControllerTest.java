@@ -15,7 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -34,15 +33,15 @@ public class SimilarProductsControllerTest extends ControllerTest {
 
     @ParameterizedTest
     @MethodSource("getParameters")
-    void doGet_withProductId1_thenResponds200Ok(String id, List<String> productIds, List<ProductDetailBO> details, HttpStatus status ) {
+    void doGet_withValidProductId_thenResponds200Ok(String id, List<String> productIds, List<ProductDetailBO> details, HttpStatus status) {
 
-        ResponseEntity<SimilarProductsBO> response = rest.getForEntity("/product/"+id+"/similar", SimilarProductsBO.class);
+        ResponseEntity<SimilarProductsBO> response = rest.getForEntity("/product/" + id + "/similar", SimilarProductsBO.class);
 
 
-        WireMock.verify(1, WireMock.getRequestedFor(WireMock.urlEqualTo("/product/"+id+"/similarids")));
+        WireMock.verify(1, WireMock.getRequestedFor(WireMock.urlEqualTo("/product/" + id + "/similarids")));
 
         productIds.forEach(pid -> {
-            WireMock.verify(1, WireMock.getRequestedFor(WireMock.urlEqualTo("/product/"+pid)));
+            WireMock.verify(1, WireMock.getRequestedFor(WireMock.urlEqualTo("/product/" + pid)));
         });
 
         Assertions.assertThat(response.getStatusCode()).isEqualTo(status);
@@ -59,15 +58,28 @@ public class SimilarProductsControllerTest extends ControllerTest {
     }
 
 
-    private static Stream<Arguments> getParameters(){
+    @Test
+    void doGet_withInvalidProductId_thenResponds404Not_Found() {
+
+        ResponseEntity response = rest.getForEntity("/product/7/similar", String.class);
+
+        WireMock.verify(1, WireMock.getRequestedFor(WireMock.urlEqualTo("/product/7/similarids")));
+
+        WireMock.verify(1, WireMock.getRequestedFor(WireMock.urlMatching("/product/.*")));
+
+        Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        
+    }
+
+    private static Stream<Arguments> getParameters() {
         Map<String, List> detailsMap = Map.of(
                 "1", Arrays.asList(
-                        new ProductDetailBO("2",    "Dress", new BigDecimal("19.99"), true),
-                        new ProductDetailBO("3",    "Blazer", new BigDecimal("29.99"), false),
-                        new ProductDetailBO("4",    "Boots", new BigDecimal("39.99"), true)),
+                        new ProductDetailBO("2", "Dress", new BigDecimal("19.99"), true),
+                        new ProductDetailBO("3", "Blazer", new BigDecimal("29.99"), false),
+                        new ProductDetailBO("4", "Boots", new BigDecimal("39.99"), true)),
                 "2", Arrays.asList(
-                        new ProductDetailBO("3",    "Blazer", new BigDecimal("29.99"), false),
-                        new ProductDetailBO("100",  "Trousers", new BigDecimal("49.99"), false),
+                        new ProductDetailBO("3", "Blazer", new BigDecimal("29.99"), false),
+                        new ProductDetailBO("100", "Trousers", new BigDecimal("49.99"), false),
                         new ProductDetailBO("1000", "Coat", new BigDecimal("89.99"), true)),
                 "4", Arrays.asList(
                         new ProductDetailBO("1", "Shirt", new BigDecimal("9.99"), true),
@@ -78,14 +90,13 @@ public class SimilarProductsControllerTest extends ControllerTest {
         );
 
         return Stream.of(
-                Arguments.of("1", Arrays.asList("2","3","4"), detailsMap.get("1"), HttpStatus.OK),
-                Arguments.of("2", Arrays.asList("3","100","1000"), detailsMap.get("2"), HttpStatus.OK),
-                Arguments.of("4", Arrays.asList("1","2","5"), detailsMap.get("4"), HttpStatus.OK),
-                Arguments.of("5", Arrays.asList("1","2","6"), detailsMap.get("5"), HttpStatus.OK)
+                Arguments.of("1", Arrays.asList("2", "3", "4"), detailsMap.get("1"), HttpStatus.OK),
+                Arguments.of("2", Arrays.asList("3", "100", "1000"), detailsMap.get("2"), HttpStatus.OK),
+                Arguments.of("4", Arrays.asList("1", "2", "5"), detailsMap.get("4"), HttpStatus.OK),
+                Arguments.of("5", Arrays.asList("1", "2", "6"), detailsMap.get("5"), HttpStatus.OK)
         );
 
     }
-
 
 
 }
