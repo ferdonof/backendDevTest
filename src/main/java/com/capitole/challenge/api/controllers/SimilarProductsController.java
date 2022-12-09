@@ -28,7 +28,7 @@ public class SimilarProductsController {
     }
 
     @ExceptionHandler(ExternalApiException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
     public String externalApiException(ExternalApiException ex) {
         return ex.getMessage();
     }

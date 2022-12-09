@@ -2,6 +2,7 @@ package com.capitole.challenge.business.usecases.impl;
 
 import com.capitole.challenge.business.domain.ProductDetailBO;
 import com.capitole.challenge.business.domain.SimilarProductsBO;
+import com.capitole.challenge.business.exceptions.ExternalApiException;
 import com.capitole.challenge.business.exceptions.SimilarProductNotFoundException;
 import com.capitole.challenge.business.usecases.GetSimilarProductsUseCase;
 import com.capitole.challenge.ports.ExistingApisPort;
@@ -40,7 +41,13 @@ public class GetSimilarProductsUseCaseImpl implements GetSimilarProductsUseCase 
 
             while (steps.get() < productSimilarIds.length) {
                 steps.incrementAndGet();
-                Optional.ofNullable(executorCompletionService.take().get()).ifPresent(detailBo -> similarProductsBO.getSimilarProducts().add(detailBo));
+                try {
+                    Optional.ofNullable(executorCompletionService.take().get()).ifPresent(detailBo -> similarProductsBO.getSimilarProducts().add(detailBo));
+                } catch (InterruptedException | ExecutionException e) {
+                    logger.info(e.getMessage());
+                } catch (Exception e) {
+                    logger.info(e.getMessage());
+                }
             }
 
             executorService.shutdownNow();
@@ -48,16 +55,15 @@ public class GetSimilarProductsUseCaseImpl implements GetSimilarProductsUseCase 
             logger.error("Returning similar products of product id: {}. [{}] ", productId, similarProductsBO);
             return similarProductsBO;
 
+        } catch (ExternalApiException ex) {
+            logger.error("Exception raised with message: {} ", ex.getMessage());
+            throw ex;
+
         } catch (SimilarProductNotFoundException ex) {
             logger.error("Exception raised with message: {} ", ex.getMessage());
             throw ex;
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        } catch (ExecutionException e) {
-            throw new RuntimeException(e);
-        } catch (Exception e) {
-            throw e;
         }
+
 
     }
 

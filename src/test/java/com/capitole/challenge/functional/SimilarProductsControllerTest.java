@@ -68,7 +68,7 @@ public class SimilarProductsControllerTest extends ControllerTest {
         WireMock.verify(1, WireMock.getRequestedFor(WireMock.urlMatching("/product/.*")));
 
         Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-        
+
     }
 
     private static Stream<Arguments> getParameters() {
@@ -81,6 +81,11 @@ public class SimilarProductsControllerTest extends ControllerTest {
                         new ProductDetailBO("3", "Blazer", new BigDecimal("29.99"), false),
                         new ProductDetailBO("100", "Trousers", new BigDecimal("49.99"), false),
                         new ProductDetailBO("1000", "Coat", new BigDecimal("89.99"), true)),
+                "3", Arrays.asList(
+                        new ProductDetailBO("100", "Trousers", new BigDecimal("49.99"), false),
+                        new ProductDetailBO("1000", "Coat", new BigDecimal("89.99"), true),
+                        new ProductDetailBO("10000", "Leather jacket", new BigDecimal("89.99"), true)),
+
                 "4", Arrays.asList(
                         new ProductDetailBO("1", "Shirt", new BigDecimal("9.99"), true),
                         new ProductDetailBO("2", "Dress", new BigDecimal("19.99"), true)),
@@ -92,9 +97,23 @@ public class SimilarProductsControllerTest extends ControllerTest {
         return Stream.of(
                 Arguments.of("1", Arrays.asList("2", "3", "4"), detailsMap.get("1"), HttpStatus.OK),
                 Arguments.of("2", Arrays.asList("3", "100", "1000"), detailsMap.get("2"), HttpStatus.OK),
+                Arguments.of("3", Arrays.asList("100", "1000", "10000"), detailsMap.get("3"), HttpStatus.OK),
                 Arguments.of("4", Arrays.asList("1", "2", "5"), detailsMap.get("4"), HttpStatus.OK),
                 Arguments.of("5", Arrays.asList("1", "2", "6"), detailsMap.get("5"), HttpStatus.OK)
         );
+
+    }
+
+    @Test
+    void doGet_withExternalApiThrowException_thenResponds503Error() {
+
+        ResponseEntity response = rest.getForEntity("/product/8/similar", String.class);
+
+        WireMock.verify(1, WireMock.getRequestedFor(WireMock.urlEqualTo("/product/8/similarids")));
+
+        WireMock.verify(1, WireMock.getRequestedFor(WireMock.urlMatching("/product/.*")));
+
+        Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE);
 
     }
 

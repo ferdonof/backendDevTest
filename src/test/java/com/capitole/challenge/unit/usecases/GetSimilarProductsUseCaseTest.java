@@ -19,7 +19,7 @@ public class GetSimilarProductsUseCaseTest {
     private GetSimilarProductsUseCase useCase = new GetSimilarProductsUseCaseImpl(port);
 
     @Test
-    void givenValidProductId_whenExecuteHavingThreeSimilarProducts_thenReturnSimilarProductBoWithThreeItems(){
+    void givenValidProductId_whenExecuteHavingThreeSimilarProducts_thenReturnSimilarProductBoWithThreeItems() {
 
         when(port.getProductSimilarIds(anyString())).thenReturn(new String[]{"1", "2", "3"});
         ProductDetailBO dress = new ProductDetailBO("2", "Dress", new BigDecimal("19.99"), true);
