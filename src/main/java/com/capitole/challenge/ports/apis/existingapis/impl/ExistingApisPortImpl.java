@@ -7,6 +7,7 @@ import com.capitole.challenge.business.exceptions.SimilarProductNotFoundExceptio
 import com.capitole.challenge.dataaccess.apis.ExistingApisConnector;
 import com.capitole.challenge.dataaccess.apis.existingapis.responses.ProductDetail;
 import com.capitole.challenge.ports.ExistingApisPort;
+import com.capitole.challenge.ports.apis.existingapis.mappers.ProductDetailToProductDetailBOMapper;
 import feign.FeignException;
 import org.springframework.stereotype.Component;
 
@@ -14,9 +15,11 @@ import org.springframework.stereotype.Component;
 public class ExistingApisPortImpl implements ExistingApisPort {
 
     private final ExistingApisConnector connector;
+    private final ProductDetailToProductDetailBOMapper mapper;
 
-    public ExistingApisPortImpl(ExistingApisConnector connector) {
+    public ExistingApisPortImpl(ExistingApisConnector connector, ProductDetailToProductDetailBOMapper mapper) {
         this.connector = connector;
+        this.mapper = mapper;
     }
 
     @Override
@@ -36,8 +39,7 @@ public class ExistingApisPortImpl implements ExistingApisPort {
     public ProductDetailBO getProductById(String id) {
         try {
             ProductDetail product = connector.getProduct(id);
-            ProductDetailBO bo = new ProductDetailBO(product.getId(), product.getName(), product.getPrice(), product.getAvailability());
-            return bo;
+            return mapper.map(product);
         } catch (FeignException ex) {
             if (FeignException.NotFound.class.isAssignableFrom(ex.getClass()))
                 throw new ProductNotFoundException(id);

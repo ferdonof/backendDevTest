@@ -8,6 +8,7 @@ import com.capitole.challenge.dataaccess.apis.ExistingApisConnector;
 import com.capitole.challenge.dataaccess.apis.existingapis.responses.ProductDetail;
 import com.capitole.challenge.ports.ExistingApisPort;
 import com.capitole.challenge.ports.apis.existingapis.impl.ExistingApisPortImpl;
+import com.capitole.challenge.ports.apis.existingapis.mappers.ProductDetailToProductDetailBOMapper;
 import feign.FeignException;
 import feign.Request;
 import org.assertj.core.api.Assertions;
@@ -23,7 +24,9 @@ class ExistingApisPortTest {
 
     private ExistingApisConnector connector = mock(ExistingApisConnector.class);
 
-    private ExistingApisPort port = new ExistingApisPortImpl(connector);
+    private ProductDetailToProductDetailBOMapper mapper = mock(ProductDetailToProductDetailBOMapper.class);
+
+    private ExistingApisPort port = new ExistingApisPortImpl(connector, mapper);
 
     @Test
     void givenProductIdExists_whenGetProductSimilarIds_thenReturnStringArrayWithIds() {
@@ -75,11 +78,14 @@ class ExistingApisPortTest {
 
     @Test
     void givenProductId_whenGetProduct_thenReturnProductDetailBO() {
-        when(connector.getProduct(anyString())).thenReturn(new ProductDetail("1", "Water power robot", BigDecimal.TEN, true));
+        ProductDetail detail = new ProductDetail("1", "Water power robot", BigDecimal.TEN, true);
+        when(connector.getProduct(anyString())).thenReturn(detail);
+        when(mapper.map(any())).thenReturn(new ProductDetailBO("1", "Water power robot", BigDecimal.TEN, true));
 
         ProductDetailBO result = port.getProductById("1");
 
         verify(connector, times(1)).getProduct("1");
+        verify(mapper, times(1)).map(detail);
 
         Assertions
                 .assertThat(result)
@@ -109,7 +115,7 @@ class ExistingApisPortTest {
     @Test
     void givenProductId_whenGetProductAndExternalServiceFail_thenThrowExternalApiException() {
         when(connector.getProduct(anyString())).thenThrow(getInternalServerError());
-
+    
         Assertions.assertThatThrownBy(() -> port.getProductById("1"))
                 .isExactlyInstanceOf(ExternalApiException.class)
                 .hasMessageContaining("Error getting product with id: 1. ");
