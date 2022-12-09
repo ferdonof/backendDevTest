@@ -7,6 +7,7 @@ import com.capitole.challenge.business.exceptions.SimilarProductNotFoundExceptio
 import com.capitole.challenge.dataaccess.apis.ExistingApisConnector;
 import com.capitole.challenge.dataaccess.apis.existingapis.responses.ProductDetail;
 import com.capitole.challenge.ports.ExistingApisPort;
+import com.capitole.challenge.ports.apis.existingapis.mappers.ProductDetailToProductDetailBOMapper;
 import feign.FeignException;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.http.HttpStatus;
@@ -17,10 +18,12 @@ public class ExistingApisPortImpl implements ExistingApisPort {
 
     private final ExistingApisConnector connector;
     private final CircuitBreakerFactory circuitBreakerFactory;
+    private final ProductDetailToProductDetailBOMapper mapper;
 
-    public ExistingApisPortImpl(ExistingApisConnector connector, CircuitBreakerFactory circuitBreakerFactory) {
+    public ExistingApisPortImpl(ExistingApisConnector connector, CircuitBreakerFactory circuitBreakerFactory, ProductDetailToProductDetailBOMapper mapper) {
         this.connector = connector;
         this.circuitBreakerFactory = circuitBreakerFactory;
+        this.mapper = mapper;
     }
 
     @Override
@@ -49,8 +52,7 @@ public class ExistingApisPortImpl implements ExistingApisPort {
 
                 });
 
-        ProductDetailBO bo = new ProductDetailBO(product.getId(), product.getName(), product.getPrice(), product.getAvailability());
-        return bo;
+        return mapper.map(product);
 
     }
 }
