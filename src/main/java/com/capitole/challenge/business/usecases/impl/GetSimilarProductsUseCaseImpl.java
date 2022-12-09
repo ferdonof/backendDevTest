@@ -77,9 +77,9 @@ public class GetSimilarProductsUseCaseImpl implements GetSimilarProductsUseCase 
         @Override
         public ProductDetailBO call() {
             try {
-                logger.error("Request product with id: {} ", id);
+                logger.info("Request product with id: {} ", id);
                 ProductDetailBO product = port.getProductById(id);
-                logger.error("Product returned: {} ", product);
+                logger.info("Product returned: {} ", product);
                 return product;
             } catch (Exception ex) {
                 logger.error("Exception raised with message: {} ", ex.getMessage());

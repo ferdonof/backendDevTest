@@ -1,19 +1,17 @@
 package com.capitole.challenge.unit.ports;
 
-import com.capitole.challenge.business.domain.ProductDetailBO;
 import com.capitole.challenge.business.exceptions.ExternalApiException;
 import com.capitole.challenge.business.exceptions.ProductNotFoundException;
 import com.capitole.challenge.business.exceptions.SimilarProductNotFoundException;
 import com.capitole.challenge.dataaccess.apis.ExistingApisConnector;
-import com.capitole.challenge.dataaccess.apis.existingapis.responses.ProductDetail;
 import com.capitole.challenge.ports.ExistingApisPort;
 import com.capitole.challenge.ports.apis.existingapis.impl.ExistingApisPortImpl;
 import feign.FeignException;
 import feign.Request;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 
-import java.math.BigDecimal;
 import java.util.Collections;
 
 import static org.mockito.ArgumentMatchers.anyString;
@@ -22,8 +20,9 @@ import static org.mockito.Mockito.*;
 class ExistingApisPortTest {
 
     private ExistingApisConnector connector = mock(ExistingApisConnector.class);
+    private CircuitBreakerFactory circuitBreakerFactory = mock(CircuitBreakerFactory.class);
 
-    private ExistingApisPort port = new ExistingApisPortImpl(connector);
+    private ExistingApisPort port = new ExistingApisPortImpl(connector, circuitBreakerFactory);
 
     @Test
     void givenProductIdExists_whenGetProductSimilarIds_thenReturnStringArrayWithIds() {
@@ -73,20 +72,6 @@ class ExistingApisPortTest {
                 null, Collections.emptyMap());
     }
 
-    @Test
-    void givenProductId_whenGetProduct_thenReturnProductDetailBO() {
-        when(connector.getProduct(anyString())).thenReturn(new ProductDetail("1", "Water power robot", BigDecimal.TEN, true));
-
-        ProductDetailBO result = port.getProductById("1");
-
-        verify(connector, times(1)).getProduct("1");
-
-        Assertions
-                .assertThat(result)
-                .usingRecursiveComparison()
-                .isEqualTo(new ProductDetailBO("1", "Water power robot", BigDecimal.TEN, true));
-
-    }
 
     @Test
     void givenProductId_whenGetProductWithNonExistentProduct_thenThrowProductNotFoundException() {

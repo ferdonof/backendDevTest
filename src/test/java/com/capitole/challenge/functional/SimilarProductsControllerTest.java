@@ -32,8 +32,34 @@ public class SimilarProductsControllerTest extends ControllerTest {
     }
 
     @ParameterizedTest
-    @MethodSource("getParameters")
+    @MethodSource("getOkParameters")
     void doGet_withValidProductId_thenResponds200Ok(String id, List<String> productIds, List<ProductDetailBO> details, HttpStatus status) {
+
+        ResponseEntity<SimilarProductsBO> response = rest.getForEntity("/product/" + id + "/similar", SimilarProductsBO.class);
+
+
+        WireMock.verify(1, WireMock.getRequestedFor(WireMock.urlEqualTo("/product/" + id + "/similarids")));
+
+        productIds.forEach(pid -> {
+            WireMock.verify(1, WireMock.getRequestedFor(WireMock.urlEqualTo("/product/" + pid)));
+        });
+
+        Assertions.assertThat(response.getStatusCode()).isEqualTo(status);
+        SimilarProductsBO obtained = response.getBody();
+
+        SimilarProductsBO similarProductsBO = new SimilarProductsBO();
+        similarProductsBO.getSimilarProducts().addAll(details);
+
+        Assertions
+                .assertThat(obtained)
+                .usingRecursiveComparison()
+                .ignoringCollectionOrder()
+                .isEqualTo(similarProductsBO);
+    }
+
+    @ParameterizedTest
+    @MethodSource("getParameters")
+    void doGet_withValidProductId_thenResponds200OkOther(String id, List<String> productIds, List<ProductDetailBO> details, HttpStatus status) {
 
         ResponseEntity<SimilarProductsBO> response = rest.getForEntity("/product/" + id + "/similar", SimilarProductsBO.class);
 
@@ -71,7 +97,7 @@ public class SimilarProductsControllerTest extends ControllerTest {
 
     }
 
-    private static Stream<Arguments> getParameters() {
+    private static Stream<Arguments> getOkParameters() {
         Map<String, List> detailsMap = Map.of(
                 "1", Arrays.asList(
                         new ProductDetailBO("2", "Dress", new BigDecimal("19.99"), true),
@@ -79,12 +105,12 @@ public class SimilarProductsControllerTest extends ControllerTest {
                         new ProductDetailBO("4", "Boots", new BigDecimal("39.99"), true)),
                 "2", Arrays.asList(
                         new ProductDetailBO("3", "Blazer", new BigDecimal("29.99"), false),
-                        new ProductDetailBO("100", "Trousers", new BigDecimal("49.99"), false),
-                        new ProductDetailBO("1000", "Coat", new BigDecimal("89.99"), true)),
+                        new ProductDetailBO("100", "Can't get product info. Please try later.", BigDecimal.ZERO, false),
+                        new ProductDetailBO("1000", "Can't get product info. Please try later.", BigDecimal.ZERO, false)),
                 "3", Arrays.asList(
-                        new ProductDetailBO("100", "Trousers", new BigDecimal("49.99"), false),
-                        new ProductDetailBO("1000", "Coat", new BigDecimal("89.99"), true),
-                        new ProductDetailBO("10000", "Leather jacket", new BigDecimal("89.99"), true)),
+                        new ProductDetailBO("100", "Can't get product info. Please try later.", BigDecimal.ZERO, false),
+                        new ProductDetailBO("1000", "Can't get product info. Please try later.", BigDecimal.ZERO, false),
+                        new ProductDetailBO("10000", "Can't get product info. Please try later.", BigDecimal.ZERO, false)),
 
                 "4", Arrays.asList(
                         new ProductDetailBO("1", "Shirt", new BigDecimal("9.99"), true),
@@ -96,10 +122,36 @@ public class SimilarProductsControllerTest extends ControllerTest {
 
         return Stream.of(
                 Arguments.of("1", Arrays.asList("2", "3", "4"), detailsMap.get("1"), HttpStatus.OK),
-                Arguments.of("2", Arrays.asList("3", "100", "1000"), detailsMap.get("2"), HttpStatus.OK),
-                Arguments.of("3", Arrays.asList("100", "1000", "10000"), detailsMap.get("3"), HttpStatus.OK),
-                Arguments.of("4", Arrays.asList("1", "2", "5"), detailsMap.get("4"), HttpStatus.OK),
-                Arguments.of("5", Arrays.asList("1", "2", "6"), detailsMap.get("5"), HttpStatus.OK)
+                Arguments.of("2", Arrays.asList("3", "100", "1000"), detailsMap.get("2"), HttpStatus.OK)
+        );
+
+    }
+
+    private static Stream<Arguments> getParameters() {
+        Map<String, List> detailsMap = Map.of(
+                "1", Arrays.asList(
+                        new ProductDetailBO("2", "Dress", new BigDecimal("19.99"), true),
+                        new ProductDetailBO("3", "Blazer", new BigDecimal("29.99"), false),
+                        new ProductDetailBO("4", "Boots", new BigDecimal("39.99"), true)),
+                "2", Arrays.asList(
+                        new ProductDetailBO("3", "Blazer", new BigDecimal("29.99"), false),
+                        new ProductDetailBO("100", "Can't get product info. Please try later.", BigDecimal.ZERO, false),
+                        new ProductDetailBO("1000", "Can't get product info. Please try later.", BigDecimal.ZERO, false)),
+                "3", Arrays.asList(
+                        new ProductDetailBO("100", "Can't get product info. Please try later.", BigDecimal.ZERO, false),
+                        new ProductDetailBO("1000", "Can't get product info. Please try later.", BigDecimal.ZERO, false),
+                        new ProductDetailBO("10000", "Can't get product info. Please try later.", BigDecimal.ZERO, false)),
+
+                "4", Arrays.asList(
+                        new ProductDetailBO("1", "Shirt", new BigDecimal("9.99"), true),
+                        new ProductDetailBO("2", "Dress", new BigDecimal("19.99"), true)),
+                "5", Arrays.asList(
+                        new ProductDetailBO("1", "Shirt", new BigDecimal("9.99"), true),
+                        new ProductDetailBO("2", "Dress", new BigDecimal("19.99"), true))
+        );
+
+        return Stream.of(
+                Arguments.of("3", Arrays.asList("100", "1000", "10000"), detailsMap.get("3"), HttpStatus.OK)
         );
 
     }

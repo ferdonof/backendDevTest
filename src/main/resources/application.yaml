@@ -1,6 +1,10 @@
 server:
   port: 5000
 
+feign:
+  okhttp:
+    enable: true
+
 existing_apis:
   host: localhost
   port: 3001
