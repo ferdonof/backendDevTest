@@ -1,6 +1,37 @@
 feign:
   okhttp:
     enable: true
+  circuitbreaker:
+    enabled: true
+
+resilience4j.circuitbreaker:
+  configs:
+    default:
+      registerHealthIndicator: true
+      # Failure rate threshold percentage
+      failureRateThreshold: 100
+      # Minimum number of call attempts before rate threshold percentage is checked.
+      ringBufferSizeInClosedState: 10
+      # How long to wait until switching to half open.
+      waitDurationInOpenState: 3s
+      # Number of successful requests before moving back to closed from half open.
+      ringBufferSizeInHalfOpenState: 5
+      # Exceptions that do not count towards opening the circuit.
+      ignoreExceptions:
+        # Ignore 4xx exceptions.
+        - org.springframework.web.client.HttpClientErrorException
+        - feign.FeignException.FeignClientException
+  instances:
+    get-product-similar-ids:
+      baseConfig: default
+    get-product:
+      baseConfig: default
+
+resilience4j.timelimiter:
+  instances:
+    default:
+      timeoutDuration: 500ms
+      cancelRunningFuture: true
 
 existing_apis:
   host: localhost
