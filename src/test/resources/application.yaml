@@ -1,6 +1,12 @@
 feign:
   okhttp:
     enable: true
+  client:
+    config:
+      default:
+        connectTimeout: 100
+        readTimeout: 60000
+
 existing_apis:
   host: localhost
   port: ${wiremock.server.port}
