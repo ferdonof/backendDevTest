@@ -3,6 +3,7 @@ package com.capitole.challenge.business.usecases.impl;
 import com.capitole.challenge.business.domain.ProductDetailBO;
 import com.capitole.challenge.business.domain.SimilarProductsBO;
 import com.capitole.challenge.business.exceptions.ExternalApiException;
+import com.capitole.challenge.business.exceptions.ProductNotFoundException;
 import com.capitole.challenge.business.exceptions.SimilarProductNotFoundException;
 import com.capitole.challenge.business.usecases.GetSimilarProductsUseCase;
 import com.capitole.challenge.ports.ExistingApisPort;
@@ -10,6 +11,7 @@ import org.apache.commons.collections.collection.SynchronizedCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.*;
@@ -56,11 +58,11 @@ public class GetSimilarProductsUseCaseImpl implements GetSimilarProductsUseCase 
             return similarProductsBO;
 
         } catch (ExternalApiException ex) {
-            logger.error("Exception raised with message: {} ", ex.getMessage());
+            logger.error("1 Exception raised with message: {} ", ex.getMessage());
             throw ex;
 
         } catch (SimilarProductNotFoundException ex) {
-            logger.error("Exception raised with message: {} ", ex.getMessage());
+            logger.error("2 Exception raised with message: {} ", ex.getMessage());
             throw ex;
         }
 
@@ -81,10 +83,13 @@ public class GetSimilarProductsUseCaseImpl implements GetSimilarProductsUseCase 
                 ProductDetailBO product = port.getProductById(id);
                 logger.info("Product returned: {} ", product);
                 return product;
+            } catch (ProductNotFoundException ex) {
+                logger.error("3 Exception raised with message: {} ", ex.getMessage());
+                return null;
             } catch (Exception ex) {
-                logger.error("Exception raised with message: {} ", ex.getMessage());
+                logger.error("3 Exception raised with message: {} ", ex.getMessage());
+                return new ProductDetailBO(id, "Can't get product info. Please try again later.", BigDecimal.ZERO, false);
             }
-            return null;
         }
     }
 }
