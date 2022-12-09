@@ -4,7 +4,7 @@
     "urlPathPattern": "/product/8/similarids"
   },
   "response": {
-    "status": 500,
+    "status": 503,
     "headers": {
       "Content-Type": "application/json"
     }

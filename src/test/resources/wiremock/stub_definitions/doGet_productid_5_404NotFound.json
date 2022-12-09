@@ -4,7 +4,7 @@
     "urlPathPattern": "/product/5"
   },
   "response": {
-    "status": 400,
+    "status": 404,
     "headers": {
       "Content-Type": "application/json"
     }
