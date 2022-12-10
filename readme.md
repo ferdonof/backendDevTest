@@ -29,7 +29,7 @@ feign:
 By the other hand, I
 created [resilience4j-approach](https://github.com/ferdonof/backendDevTest/tree/resilience4j-approach) branch, with a
 resilience4j approach. I didn't worked with
-resilience4j before, but after a bit of research and hands-on I thinks the goal was achieved. However, I think
+resilience4j before, but after a bit of research and hands-on I think the goal was achieved. However, I think
 this could be better having more research.
 The resilience4j configuration is this:
 
@@ -64,6 +64,17 @@ resilience4j.timelimiter:
       timeoutDuration: 500ms
       cancelRunningFuture: true
 ```
+
+# About business and other project rules
+
+I decided to consider the next business and development rules because I think I was free to choose:
+
+- If a request for the external api takes too long, I return a ProductDetail with the ID, and a message in its name.
+  This will be considered specially for resilience4j-approach.
+- In feign-approach, I decided to set connection timeout to 100ms, and read timeout to 60s (over the most expensive
+  request).
+- I stated to develop the use case functionality in a synchronous way (as you can see in revision 7735f74a), then I
+  replace it with a threaded way to request for product details.
 
 # Application architecture
 
