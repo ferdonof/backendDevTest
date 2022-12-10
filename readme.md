@@ -117,6 +117,7 @@ feign-approach and resilience4j-approach respectively.
 # Tests
 
 I tried to create functional and unit test for each branch, but for reasons of time I didn't develop integration tests.
-In fact, I removed ExistentApiPortTest from resilient4j-approach because it didn't work without including circuit
-breaker, and I didn't have time to investigate how to write them.
+In fact, I removed ExistentApiPortTest (unit test) from resilient4j-approach because it didn't work without including
+circuit breaker, and I didn't have time to investigate how to write them.
 Functional and unit tests were tuned to work in each branch.
+Code line coverage raises 90% in each branch.
