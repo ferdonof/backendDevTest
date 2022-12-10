@@ -1,16 +1,16 @@
 # Development notes
 
 The original readme was renamed
-to [README]{https://github.com/ferdonof/backendDevTest/blob/resilience4j-approach/readme_original.md}
+to [readme_original.md](https://github.com/ferdonof/backendDevTest/blob/resilience4j-approach/readme_original.md)
 
 For this project I developed a spring boot application and the solution uses different approaches, each one in different
 branches.
 The original repository files remains in main branch.
-I created a [development]{https://github.com/ferdonof/backendDevTest/tree/development} branch with default values of the
+I created a [development](https://github.com/ferdonof/backendDevTest/tree/development) branch with default values of the
 server for request
 time a read time.
 Development branch was forked in two additional branches.
-The [feign-approach]{https://github.com/ferdonof/backendDevTest/tree/feign-approach} preserves the files from
+The [feign-approach](https://github.com/ferdonof/backendDevTest/tree/feign-approach) preserves the files from
 development files,
 but connection-timeout and read-timeout where set to 100ms and 60000ms respectively, according to the expected
 request/response times.
@@ -27,7 +27,7 @@ feign:
 ```
 
 By the other hand, I
-created [resilience4j-approach]{https://github.com/ferdonof/backendDevTest/tree/resilience4j-approach} branch, with a
+created [resilience4j-approach](https://github.com/ferdonof/backendDevTest/tree/resilience4j-approach) branch, with a
 resilience4j approach. I didn't worked with
 resilience4j before, but after a bit of research and hands-on I thinks the goal was achieved. However, I think
 this could be better having more research.
